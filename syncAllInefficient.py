@@ -2,6 +2,7 @@ import argparse
 import os
 from main import handleFile
 import googleServiceAccount
+import gitUtils
 
 def isValidFolder(parser, arg):
     if not os.path.exists(arg):
@@ -27,6 +28,8 @@ def main():
     parser = argparse.ArgumentParser(description='A cool program.')
 
     args = parser.parse_args()
+
+    gitUtils.pull()
 
     creds = googleServiceAccount.getCredentials()
     driveService = googleServiceAccount.getDriveService(creds)
