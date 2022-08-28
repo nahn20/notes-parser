@@ -1,5 +1,7 @@
 import git
+import pathlib
 
 def pull():
-    g = git.cmd.Git('sync')
+    path = os.path.join(pathlib.Path(__file__).parent.resolve(), 'sync')
+    g = git.cmd.Git(path)
     g.pull()
