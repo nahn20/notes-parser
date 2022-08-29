@@ -25,6 +25,8 @@ def main():
     driveService = googleServiceAccount.getDriveService(creds)
     docService = googleServiceAccount.getDocService(creds)
 
-    enqueueAll(driveService, docService, "sync")
+    dirname = os.path.dirname(__file__)
+    target = open(os.path.join(dirname, 'sync'))
+    enqueueAll(driveService, docService, "target")
 if __name__ == "__main__":
     main()
