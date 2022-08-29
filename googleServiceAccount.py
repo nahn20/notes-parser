@@ -1,4 +1,5 @@
 import json
+import os
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -9,7 +10,8 @@ PROJECT_ID = '116086635593352459139'
 SCOPES = ['https://www.googleapis.com/auth/documents', 'https://www.googleapis.com/auth/drive']
 
 def getCredentials():
-    f = open('certificate.json')
+    dirname = os.path.dirname(__file__)
+    f = open(os.path.join(dirname, 'certificate.json'))
     info = json.load(f)
     creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
     return creds

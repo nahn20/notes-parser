@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 SCRIPTPATH=$(dirname "$0")
 
 (cd $SCRIPTPATH; git pull) &&

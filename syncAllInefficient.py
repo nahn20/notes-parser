@@ -4,12 +4,6 @@ from main import handleFile
 import googleServiceAccount
 import gitUtils
 
-def isValidFolder(parser, arg):
-    if not os.path.exists(arg):
-        parser.error("The folder %s does not exist!" % arg)
-    else:
-        return arg
-
 def enqueueAll(driveService, docService, path):
     for item in os.listdir(path):
         full = os.path.join(path, item)
@@ -25,10 +19,6 @@ def enqueueAll(driveService, docService, path):
                 enqueueAll(driveService, docService, full)
 
 def main():
-    parser = argparse.ArgumentParser(description='A cool program.')
-
-    args = parser.parse_args()
-
     gitUtils.pull()
 
     creds = googleServiceAccount.getCredentials()

@@ -41,12 +41,14 @@ def getFileId(driveService, rootFolder, path=[]):
 def getOrCreateDoc(driveService, docService, rootFolder, path):
     arr_path = formatPath(path)
     arr_path.append(getCleanName(path))
+    if(arr_path[0] == 'sync' or arr_path[0] == 'sync-docs'):
+        arr_path.pop(0)
     potentialId = getFileId(driveService, rootFolder, arr_path)
     if(potentialId):
         return potentialId
     return createDoc(docService, title=getCleanName(path))
 def getOrCreateFolder(driveService, rootFolder, path=[]):
-    if(path[0] == 'sync'):
+    if(path[0] == 'sync' or path[0] == 'sync-docs'):
         path.pop(0)
     prev = rootFolder
     for folder in path:
@@ -66,6 +68,7 @@ def getOrCreateFolder(driveService, rootFolder, path=[]):
 def isSafeOverwrite(driveService, fileId):
     res = driveService.files().get(fileId=fileId, fields='modifiedTime,appProperties').execute()
     if('appProperties' not in res):
+        touch(driveService, fileId)
         return True
     expected_last_modified = iso8601.parse_date(res['appProperties']['lastTouched'])
     last_modified = iso8601.parse_date(res['modifiedTime'])
@@ -88,6 +91,9 @@ def handleFile(driveService, docService, args):
         args = vars(args)
     if(args.get('config')):
         config = json.load(args['config'])
+    dirname = os.path.dirname(__file__)
+    f = open(os.path.join(dirname, 'config.json'))
+    config = json.load(f)
 
     docId = getOrCreateDoc(driveService, docService, config['rootFolder'], args['file'].name)
     #docId = '1wf9GyXiBGgOExYTgfd0SyTUoDwUUfogw2WJ_8V32uP0'
@@ -104,20 +110,22 @@ def handleFile(driveService, docService, args):
         print("[Unsafe Overwrite] Flag dictates overwrite anyways for file {}".format(doc['title']))
     if(not safe_overwrite and not args.get('overwrite')):
         print("[Unsafe Overwrite] Terminating for file {}".format(doc['title']))
-    if((safe_overwrite or args.get('overwrite')) and endIndex > 1):
-        requests.append({
-            'deleteContentRange': {
-                'range': {
-                    'endIndex': endIndex,
-                    'startIndex': 1
+    if((safe_overwrite or args.get('overwrite'))):
+        if(endIndex > 1):
+            requests.append({
+                'deleteContentRange': {
+                    'range': {
+                        'endIndex': endIndex,
+                        'startIndex': 1
+                    }
                 }
-            }
-        })
-        endIndex = 1
+            })
+            endIndex = 1
     else:
         return
     curIndex = endIndex
 
+    lineParser.indentStart = -1
     for dirtyLine in args['file']:
         line = dirtyLine.rstrip()
         res = lineParser.parseLine(line+'\n', curIndex)
@@ -145,7 +153,6 @@ def moveToFolder(driveService, fileId, folderId):
 def main():
     parser = argparse.ArgumentParser(description='A cool program.')
     parser.add_argument('file', help="input file path", type=lambda x: isValidFile(parser, x))
-    parser.add_argument('--config', help="config file path", type=lambda x: isValidFile(parser, x))
     parser.add_argument('--upload', action=argparse.BooleanOptionalAction)
     parser.add_argument('--overwrite', action=argparse.BooleanOptionalAction)
 
