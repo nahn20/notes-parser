@@ -91,9 +91,10 @@ def handleFile(driveService, docService, args):
         args = vars(args)
     if(args.get('config')):
         config = json.load(args['config'])
-    dirname = os.path.dirname(__file__)
-    f = open(os.path.join(dirname, 'config.json'))
-    config = json.load(f)
+    else:
+        dirname = os.path.dirname(__file__)
+        f = open(os.path.join(dirname, 'config.json'))
+        config = json.load(f)
 
     docId = getOrCreateDoc(driveService, docService, config['rootFolder'], args['file'].name)
     #docId = '1wf9GyXiBGgOExYTgfd0SyTUoDwUUfogw2WJ_8V32uP0'

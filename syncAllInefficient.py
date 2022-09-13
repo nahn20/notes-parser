@@ -10,7 +10,6 @@ def enqueueAll(driveService, docService, path):
         if os.path.isfile(full):
             mock_args = {
                 'file': open(full, 'r'),
-                'config': open('config.json', 'r'),
                 'overwrite': True
             }
             handleFile(driveService, docService, mock_args)
