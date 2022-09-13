@@ -48,8 +48,9 @@ def getOrCreateDoc(driveService, docService, rootFolder, path):
         return potentialId
     return createDoc(docService, title=getCleanName(path))
 def getOrCreateFolder(driveService, rootFolder, path=[]):
-    if(path[0] == 'sync' or path[0] == 'sync-docs'):
+    while(path[0] != 'sync' and path[0] != 'sync-docs'):
         path.pop(0)
+    path.pop(0)
     prev = rootFolder
     for folder in path:
         res = driveService.files().list(q=f"mimeType='application/vnd.google-apps.folder' and parents='{prev}' and name='{folder}'").execute()
