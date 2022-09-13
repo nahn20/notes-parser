@@ -41,8 +41,9 @@ def getFileId(driveService, rootFolder, path=[]):
 def getOrCreateDoc(driveService, docService, rootFolder, path):
     arr_path = formatPath(path)
     arr_path.append(getCleanName(path))
-    if(arr_path[0] == 'sync' or arr_path[0] == 'sync-docs'):
+    while(arr_path[0] != 'sync' and arr_path[0] != 'sync-docs'):
         arr_path.pop(0)
+    arr_path.pop(0)
     potentialId = getFileId(driveService, rootFolder, arr_path)
     if(potentialId):
         return potentialId
